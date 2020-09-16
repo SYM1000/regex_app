@@ -1,0 +1,236 @@
+//
+//  ContentView.swift
+//  Poyecto_MatesCompus
+//
+//  Created by Santiago Yeomans on 14/09/20.
+//  Copyright © 2020 Santiago Yeomans. All rights reserved.
+//
+
+import SwiftUI
+
+struct ContentView: View {
+    @State private var name: String = "Tim"
+    
+    var body: some View {
+        
+        Home()
+    }
+}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}
+
+struct Home : View{
+    
+    @State private var original: String = "aabb"
+    @State private var entrada: String = "ab"
+    @State private var remplazar: String = "ccc"
+    @State private var resultado: String = "acccb"
+    
+    var body : some View{
+        
+        ZStack{
+            Color.init(.white).edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing : 0){
+            
+            Image("otraFotillo")
+            .resizable()
+                .frame(height: UIScreen.main.bounds.height/4)
+            
+            ZStack(alignment: .topTrailing){
+            
+                ScrollView(showsIndicators: false){
+            VStack{
+                HStack{
+                    Text("Primer Proyecto")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.black)
+                    Spacer()
+                }.padding(.top, 25)
+                
+                HStack{
+                    VStack(alignment: .leading, spacing: 15){
+                        Text("Santiago Yeomans - A01251000")
+                            .font(.headline)
+                            .foregroundColor(.gray)
+                            .padding(.bottom, 30)
+                        
+                    }
+                    Spacer()
+                }
+                //.padding(.top)
+                
+                //Datos de entrada
+                VStack{
+                    
+//                        Text("Ingresa Datos")
+//                            .font(.title)
+//                            .fontWeight(.bold)
+//                            .padding(.bottom)
+                    
+                    
+                    VStack(alignment: .leading){
+                    Text("Cadena Original:")
+                        .bold()
+                        
+                    TextField("Cadena original", text: $original)
+                        .padding(.all,10)
+                        .foregroundColor(.gray)
+                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                        .cornerRadius(10)
+                        .font(.system(size: 18))
+                    }.padding(.bottom,10)
+                    
+                    VStack(alignment: .leading){
+                    Text("Patrón de entrada:")
+                        .bold()
+                        
+                    TextField("Patroón de entrada", text: $entrada)
+                        .padding(.all,10)
+                        .foregroundColor(.gray)
+                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                        .cornerRadius(10)
+                        .font(.system(size: 18))
+                    }.padding(.bottom,10)
+                    
+                    VStack(alignment: .leading){
+                    Text("Cadena a reemplazar:")
+                        .bold()
+                        
+                    TextField("Cadena a reemplazar", text: $remplazar)
+                        .padding(.all,10)
+                        .foregroundColor(.gray)
+                        .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
+                        .cornerRadius(10)
+                        .font(.system(size: 18))
+                    }.padding(.bottom,10)
+                    
+                }
+                
+                //Resultado
+                Text("👇Resultado👇")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding()
+                
+                Text("\(resultado)")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding(.bottom)
+                    .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                
+                Spacer()
+                //Boton de calcular
+                Button(action: {
+                    self.resultado = reemplazar(original: self.original, entrada: self.entrada, remplazadora: self.remplazar)
+                    
+                }) {
+                    VStack{
+                        Text("Calcular").foregroundColor(Color.white)
+                            .font(.title)
+                            .padding(.all)
+                    }
+                .frame(width: 270)
+                    .background(Color("Color"))
+                    .cornerRadius(15)
+                    .shadow(radius: 10)
+                    
+                    
+                }
+                
+                
+                
+            }
+            .padding(.bottom, 40)
+            .padding(.horizontal, 20)
+            .background(CustomShape().fill(Color.white))
+            .clipShape(Corners())
+                }
+            }
+            .zIndex(40)
+            .offset(y: -40)
+            
+            Spacer()
+            
+        }.edgesIgnoringSafeArea(.top)
+            
+        }
+    }
+}
+
+struct CustomShape : Shape{
+    
+    func path(in rect: CGRect) -> Path {
+        
+        return Path{path in
+            
+            path.move(to: CGPoint(x: 0, y: 0))
+            path.addLine(to: CGPoint(x: rect.width, y: 0))
+            path.addLine(to: CGPoint(x: rect.width, y: rect.height))
+            path.addLine(to: CGPoint(x: 0, y: rect.height - 40))
+        }
+    }
+}
+
+struct Corners : Shape{
+    
+    func path(in rect: CGRect) -> Path {
+        
+       let path = UIBezierPath(roundedRect: rect, byRoundingCorners: [.topLeft,.topRight], cornerRadii: CGSize(width: 35, height: 35))
+       
+       return Path(path.cgPath)
+    }
+}
+
+func reemplazar(original: String, entrada: String, remplazadora: String) -> String {
+    var operaciones = [String]()
+    var nueva = original
+    
+    let entrada2 = cambioSimbolo(original: entrada)
+    
+    operaciones = entrada2.components(separatedBy: "/")
+    //print(operaciones)
+    
+    for oper in operaciones{
+        
+        //Si es una cerradura
+        if(oper.contains("*")){
+            
+            var cerradura = oper;
+            var palabrota = cerradura.prefix(cerradura.count-1) //Cuando la cerradura es mayor a 0
+            var palabrita = cerradura.prefix(cerradura.count-2) //Cuando la cerradura es 0
+            var letra = cerradura.suffix(2)
+            letra = letra.prefix(1)
+            
+//            print("La cerradura es: \(cerradura)")
+//            print("La palabrota es: \(palabrota)")
+//            print("La palabrita es: \(palabrita)")
+//            print("La última letra es: \(letra)")
+            
+            
+
+            
+            
+            
+        
+        //Si no tiene cerradura
+        }else{
+            nueva = nueva.replacingOccurrences(of: oper, with: remplazadora)
+        }
+        
+    }
+    
+    
+    return nueva;
+}
+
+func cambioSimbolo(original: String) -> String{
+    //Remplazar los '+' por '/'
+    return original.replacingOccurrences(of: "+", with: "/")
+}
