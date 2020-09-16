@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct ContentView: View {
     @State private var name: String = "Tim"
@@ -202,9 +203,9 @@ func reemplazar(original: String, entrada: String, remplazadora: String) -> Stri
         //Si es una cerradura
         if(oper.contains("*")){
             
-            var cerradura = oper;
-            var palabrota = cerradura.prefix(cerradura.count-1) //Cuando la cerradura es mayor a 0
-            var palabrita = cerradura.prefix(cerradura.count-2) //Cuando la cerradura es 0
+            let cerradura = oper;
+            let palabrota = cerradura.prefix(cerradura.count-1) //Cuando la cerradura es mayor a 0
+            let palabrita = cerradura.prefix(cerradura.count-2) //Cuando la cerradura es 0
             var letra = cerradura.suffix(2)
             letra = letra.prefix(1)
             
@@ -213,7 +214,42 @@ func reemplazar(original: String, entrada: String, remplazadora: String) -> Stri
 //            print("La palabrita es: \(palabrita)")
 //            print("La última letra es: \(letra)")
             
+            if(!nueva.contains(palabrita)){continue}
             
+            while(nueva.contains(palabrita)){
+            
+                let ini = indice(base: nueva, buscar: String(palabrita))
+                print("El indice es: \(ini) la cerradura es \(cerradura)")
+                let cerrado = indice(base: nueva, buscar: String(palabrota))
+                
+                if(cerrado >= 0){
+                    
+                    var nuevita = String()
+                    nuevita.append(contentsOf: palabrita)
+                    var ciclo = ini + palabrita.count
+                    var recorrido = [String]()
+                    
+                    //recorrido = nueva.components(separatedBy: "")
+                    //recorrido = Array(arrayLiteral: nueva)
+                    recorrido = nueva.map { String($0) }
+                    
+                    print("la longitud es: ", recorrido.count)
+                    while(recorrido[ciclo] == letra && ciclo<recorrido.count){
+                        nuevita.append(recorrido[ciclo])
+                        ciclo+=1
+                        if(ciclo == recorrido.count) {break}
+                    }
+                    print("La nueva es \(nuevita)")
+                    nueva = nueva.replaceFirst(of: nuevita, with: remplazadora)
+                    
+                    
+                }else{ //La cerradura tiene un elemento en 0
+                    nueva = nueva.replacingOccurrences(of: palabrita, with: remplazadora)
+                }
+                
+                
+            
+            }
 
             
             
@@ -233,4 +269,75 @@ func reemplazar(original: String, entrada: String, remplazadora: String) -> Stri
 func cambioSimbolo(original: String) -> String{
     //Remplazar los '+' por '/'
     return original.replacingOccurrences(of: "+", with: "/")
+}
+
+func indice(base: String, buscar: String) -> Int{
+    if let range: Range<String.Index> = base.range(of: buscar) {
+                   let index: Int = base.distance(from: base.startIndex, to: range.lowerBound)
+                   //print("index: ", index) //index: 2
+                return index
+               }
+              return -1
+}
+
+
+//Foundation
+extension StringProtocol {
+    func index<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
+        range(of: string, options: options)?.lowerBound
+    }
+    func endIndex<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
+        range(of: string, options: options)?.upperBound
+    }
+    func indices<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> [Index] {
+        var indices: [Index] = []
+        var startIndex = self.startIndex
+        while startIndex < endIndex,
+            let range = self[startIndex...]
+                .range(of: string, options: options) {
+                indices.append(range.lowerBound)
+                startIndex = range.lowerBound < range.upperBound ? range.upperBound :
+                    index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
+        }
+        return indices
+    }
+    func ranges<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> [Range<Index>] {
+        var result: [Range<Index>] = []
+        var startIndex = self.startIndex
+        while startIndex < endIndex,
+            let range = self[startIndex...]
+                .range(of: string, options: options) {
+                result.append(range)
+                startIndex = range.lowerBound < range.upperBound ? range.upperBound :
+                    index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
+        }
+        return result
+    }
+}
+
+extension String {
+  
+  public func replaceFirst(of pattern:String,
+                           with replacement:String) -> String {
+    if let range = self.range(of: pattern){
+      return self.replacingCharacters(in: range, with: replacement)
+    }else{
+      return self
+    }
+  }
+  
+  public func replaceAll(of pattern:String,
+                         with replacement:String,
+                         options: NSRegularExpression.Options = []) -> String{
+    do{
+      let regex = try NSRegularExpression(pattern: pattern, options: [])
+      let range = NSRange(0..<self.utf16.count)
+      return regex.stringByReplacingMatches(in: self, options: [],
+                                            range: range, withTemplate: replacement)
+    }catch{
+      NSLog("replaceAll error: \(error)")
+      return self
+    }
+  }
+  
 }
