@@ -205,7 +205,7 @@ func reemplazar(original: String, entrada: String, remplazadora: String) -> Stri
             
             let cerradura = oper;
             let palabrota = cerradura.prefix(cerradura.count-1) //Cuando la cerradura es mayor a 0
-            let palabrita = cerradura.prefix(cerradura.count-2) //Cuando la cerradura es 0
+            var palabrita = cerradura.prefix(cerradura.count-2) //Cuando la cerradura es 0
             var letra = cerradura.suffix(2)
             letra = letra.prefix(1)
             
@@ -213,6 +213,11 @@ func reemplazar(original: String, entrada: String, remplazadora: String) -> Stri
 //            print("La palabrota es: \(palabrota)")
 //            print("La palabrita es: \(palabrita)")
 //            print("La última letra es: \(letra)")
+            if(palabrota.count == 1){
+                print("Tenemos una sola letra")
+                letra = palabrota
+                palabrita = palabrota
+            }
             
             if(!nueva.contains(palabrita)){continue}
             
