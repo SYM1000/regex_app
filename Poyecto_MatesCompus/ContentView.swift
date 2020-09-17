@@ -10,8 +10,6 @@ import SwiftUI
 import Foundation
 
 struct ContentView: View {
-    @State private var name: String = "Tim"
-    
     var body: some View {
         
         Home()
